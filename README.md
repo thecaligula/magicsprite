@@ -1,16 +1,72 @@
-# React + Vite
+# 🎨 MagicSprite - Fusebead Pattern Creator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sprite-to-fusebead conversion tool that transforms pixel art into optimized bead patterns. Features color adjustment tools, inventory tracking, and batch processing capabilities to streamline the bead sprite creation workflow. Includes post generation editing.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🔄 Smart Image Processing
+- Intelligent sprite-to-bead pattern conversion
+- Automatic whitespace trimming
+- Optional 2x downscaling for upscaled sprites
+- Transparent background preservation
+- Advanced color adjustment tools
 
-## React Compiler
+### 🎨 Color Controls
+- Pre-conversion color adjustments
+- Target specific color groups (reds, blues, etc.)
+- Global saturation and brightness controls
+- Real-time adjustment previews
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 📐 Precise Editing
+- Interactive bead grid editor
+- Individual bead color overrides
+- Bulk color replacement tools
+- Adjustable zoom levels (24px to 96px per bead)
+- Live preview updates
 
-## Expanding the ESLint configuration
+### 📦 Inventory Management
+- (Currently only supports Arktal C, 2.6mm hard beads)
+- Track your bead quantities
+- Get shortage warnings
+- See exactly how many beads you need
+- Pre-loaded with standard bead colors
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 🔍 Batch Analysis
+- Process multiple sprites at once
+- Get accuracy scores for each conversion
+- Sort by conversion quality
+- Smart color palette suggestions
+
+## 🚀 Getting Started
+
+1. Clone the repo
+```bash
+git clone https://github.com/thecaligula/magicsprite.git
+cd magicsprite
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Start the development server
+```bash
+npm run dev
+```
+
+## 🛠️ Tech Stack
+
+- React + Vite
+- Tailwind CSS
+- Canvas API for image processing
+
+## 🤝 Contributing
+
+Found a bug? Have a cool idea? Feel free to:
+- Open an issue
+- Submit a pull request
+
+## 📝 License
+
+MIT

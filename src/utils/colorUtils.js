@@ -1,11 +1,3 @@
-/**
- * Converts RGB color values to hexadecimal color string.
- * 
- * @param {number} r - Red component (0-255)
- * @param {number} g - Green component (0-255)
- * @param {number} b - Blue component (0-255)
- * @returns {string} Hex color code (e.g., '#ff0000' for red)
- */
 export function rgbToHex(r, g, b) {
   return '#' + [r, g, b].map(x => {
     const hex = x.toString(16);
@@ -13,27 +5,12 @@ export function rgbToHex(r, g, b) {
   }).join('');
 }
 
-/**
- * Converts hexadecimal color string to RGB color object.
- * 
- * @param {string} hex - Hex color code (e.g., '#ff0000')
- * @returns {Object} RGB color object with r, g, b properties
- */
 export function hexToRgb(hex) {
   const h = hex.replace('#', '');
   const bigint = parseInt(h, 16);
   return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
 }
 
-/**
- * Calculates weighted squared distance between two RGB colors.
- * Uses a perceptual color difference algorithm that accounts for
- * human eye sensitivity to different color components.
- * 
- * @param {Object} c1 - First RGB color {r, g, b}
- * @param {Object} c2 - Second RGB color {r, g, b}
- * @returns {number} Weighted squared distance between colors
- */
 export function colorDistanceSq(c1, c2) {
   const rMean = (c1.r + c2.r) / 2;
   const r = c1.r - c2.r;
@@ -47,26 +24,11 @@ export function colorDistanceSq(c1, c2) {
   return weightR * r * r + weightG * g * g + weightB * b * b;
 }
 
-/**
- * Calculates perceived brightness of a color using the YIQ formula.
- * Accounts for human perception of different color components.
- * 
- * @param {string} hex - Hex color code
- * @returns {number} Perceived brightness value (0-255)
- */
 export function getBrightness(hex) {
   const rgb = hexToRgb(hex);
   return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
 }
 
-/**
- * Finds the closest matching bead color from available inventory.
- * Uses weighted color distance for perceptually accurate matches.
- * 
- * @param {Object} pixelRgb - Source color in RGB format
- * @param {Array} inventoryPalette - Available bead colors
- * @returns {Object} Best matching bead color with metadata
- */
 export function findNearestInventoryColor(pixelRgb, inventoryPalette) {
   let best = null;
   let bestDist = Infinity;
@@ -81,14 +43,6 @@ export function findNearestInventoryColor(pixelRgb, inventoryPalette) {
   return best;
 }
 
-/**
- * Finds closest matching color from a general palette list.
- * Similar to findNearestInventoryColor but works with raw RGB values.
- * 
- * @param {Object} rgb - Source color in RGB format
- * @param {Array} paletteList - List of palette colors with r,g,b properties
- * @returns {Object} Best matching palette color
- */
 export function findNearestPaletteColor(rgb, paletteList) {
   let best = null;
   let bestDist = Infinity;
@@ -103,4 +57,73 @@ export function findNearestPaletteColor(rgb, paletteList) {
   }
   
   return best;
+}
+
+// src/utils/colorModifiers.js
+export function rgbToHsv(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0, s = (max === 0 ? 0 : d / max), v = max;
+
+  switch (max) {
+    case min: h = 0; break;
+    case r: h = ((g - b) / d + (g < b ? 6 : 0)); break;
+    case g: h = ((b - r) / d + 2); break;
+    case b: h = ((r - g) / d + 4); break;
+  }
+  h /= 6;
+  return { h, s, v };
+}
+
+export function hsvToRgb(h, s, v) {
+  let r, g, b;
+  let i = Math.floor(h * 6);
+  let f = h * 6 - i;
+  let p = v * (1 - s);
+  let q = v * (1 - f * s);
+  let t = v * (1 - (1 - f) * s);
+
+  switch (i % 6) {
+    case 0: r = v; g = t; b = p; break;
+    case 1: r = q; g = v; b = p; break;
+    case 2: r = p; g = v; b = t; break;
+    case 3: r = p; g = q; b = v; break;
+    case 4: r = t; g = p; b = v; break;
+    case 5: r = v; g = p; b = q; break;
+  }
+
+  return {
+    r: Math.round(r * 255),
+    g: Math.round(g * 255),
+    b: Math.round(b * 255)
+  };
+}
+
+// Named hue bands (Option B)
+export const HUE_GROUPS = {
+  Red:       [350,  10],
+  Orange:    [10,   40],
+  Yellow:    [40,   70],
+  Lime:      [70,   100],
+  Green:     [100,  150],
+  Teal:      [150,  180],
+  Cyan:      [180,  200],
+  Sky:       [200,  220],
+  Blue:      [220,  260],
+  Purple:    [260,  290],
+  Pink:      [290,  330],
+  Brown:     [20,   40],  // brown is tricky; shares with orange
+  Gray:      null // handled separately: low saturation threshold
+};
+
+export function isHueInGroup(hDegrees, groupName, saturation) {
+  if (groupName === "Gray") {
+    return saturation < 0.18;
+  }
+  const range = HUE_GROUPS[groupName];
+  if (!range) return false;
+  const [min, max] = range;
+  if (min < max) return hDegrees >= min && hDegrees <= max;
+  return hDegrees >= min || hDegrees <= max; // wrap-around reds
 }

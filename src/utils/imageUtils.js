@@ -1,16 +1,5 @@
-/**
- * Trims transparent or white borders from a canvas image.
- * Handles both transparent backgrounds and white/light backgrounds.
- * 
- * Process:
- * 1. Detects if image uses transparency
- * 2. If not transparent, checks if background is light
- * 3. Finds boundaries of non-empty content
- * 4. Creates new canvas with trimmed content
- * 
- * @param {HTMLCanvasElement} srcCanvas - Source canvas to trim
- * @returns {HTMLCanvasElement} New canvas with trimmed content
- */
+import { rgbToHsv, hsvToRgb, isHueInGroup } from "./colorUtils";
+
 export function trimCanvasWhitespace(srcCanvas) {
   const ctx = srcCanvas.getContext('2d');
   const w = srcCanvas.width;
@@ -68,16 +57,6 @@ export function trimCanvasWhitespace(srcCanvas) {
   return out;
 }
 
-/**
- * Loads an image file into an Image object asynchronously.
- * Handles the multi-step process of:
- * 1. Reading file as DataURL
- * 2. Creating Image object
- * 3. Loading image data
- * 
- * @param {File} file - Image file from input or drop event
- * @returns {Promise<HTMLImageElement>} Loaded image
- */
 export function loadImageFromFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -92,21 +71,6 @@ export function loadImageFromFile(file) {
   });
 }
 
-/**
- * Calculates color accuracy score between original image and bead conversion.
- * Score ranges from 0-100, where:
- * - 100: Perfect color match
- * - 0: Maximum possible color difference
- * 
- * Process:
- * 1. Compares each non-transparent pixel
- * 2. Calculates Euclidean distance in RGB space
- * 3. Averages differences and normalizes to 0-100 scale
- * 
- * @param {ImageData} originalImageData - Source image pixel data
- * @param {ImageData} beadImageData - Converted bead pattern pixel data
- * @returns {number} Accuracy score (0-100)
- */
 export function calculateAccuracyScore(originalImageData, beadImageData) {
   const data1 = originalImageData.data;
   const data2 = beadImageData.data;
@@ -139,4 +103,46 @@ export function calculateAccuracyScore(originalImageData, beadImageData) {
   const accuracy = 100 * (1 - avgDiff / maxDiff);
   
   return accuracy;
+}
+
+export async function applyModifiersToImage(img, modifiers) {
+  if (!modifiers) return img;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const d = imageData.data;
+
+  const { globalSat = 0, globalVal = 0, targetHue = "All", targetSat = 0, targetVal = 0 } = modifiers;
+
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] < 128) continue; // skip transparent
+    const r = d[i], g = d[i + 1], b = d[i + 2];
+    const { h, s, v } = rgbToHsv(r, g, b);
+
+    let hD = h * 360;
+    let newS = s + globalSat / 100;
+    let newV = v + globalVal / 100;
+
+    if (targetHue !== "All" && isHueInGroup(hD, targetHue, s)) {
+      newS += targetSat / 100;
+      newV += targetVal / 100;
+    }
+
+    newS = Math.min(1, Math.max(0, newS));
+    newV = Math.min(1, Math.max(0, newV));
+
+    const { r: nr, g: ng, b: nb } = hsvToRgb(h, newS, newV);
+    d[i] = nr; d[i + 1] = ng; d[i + 2] = nb;
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  const newImg = new Image();
+  newImg.src = canvas.toDataURL();
+  await newImg.decode();
+  return newImg;
 }

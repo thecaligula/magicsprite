@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { rgbToHex } from './utils/colorUtils';
+import { useState, useEffect, useRef } from 'react';
+import { rgbToHex, HUE_GROUPS } from './utils/colorUtils';
 import { useInventory } from './hooks/useInventory';
 import { useImageConversion } from './hooks/useImageConversion';
 import { useGridEditor } from './hooks/useGridEditor';
@@ -76,6 +76,11 @@ export default function App() {
   
   const {
     imageUrl,
+    modifiers,
+    setModifiers,
+    isModifiersOpen,
+    setIsModifiersOpen,
+    modifiedPreviewUrl,
     convertedUrl,
     beadCount,
     pixelGridData,
@@ -121,6 +126,7 @@ export default function App() {
 
       <SingleConversion
         imageUrl={imageUrl}
+        modifiedPreviewUrl={modifiedPreviewUrl}
         convertedUrl={convertedUrl}
         attemptDownscale={attemptDownscale}
         setAttemptDownscale={setAttemptDownscale}
@@ -130,6 +136,11 @@ export default function App() {
         showGrid={showGrid}
         setShowGrid={setShowGrid}
         palette={palette}
+        modifiers={modifiers}
+        setModifiers={setModifiers}
+        HUE_GROUPS={HUE_GROUPS}
+        isModifiersOpen={isModifiersOpen}
+        setIsModifiersOpen={setIsModifiersOpen}
       />
 
       {/* Interactive Editing Section - Only shown when grid is toggled and data exists */}
@@ -183,13 +194,14 @@ export default function App() {
       <div className="mt-8 text-sm text-gray-600 border-t pt-4">
         <strong>Features:</strong>
         <ul className="list-disc ml-5 space-y-1 mt-2">
-          <li><strong>Inventory Management:</strong> All {palette.length} bead colors are pre-loaded. Expand the inventory section to adjust quantities.</li>
-          <li><strong>Single Conversion:</strong> Upload one sprite for detailed editing with individual cell overrides.</li>
-          <li><strong>Grid Zoom:</strong> Use +/- buttons to zoom in/out on the bead grid (24px to 96px per cell).</li>
-          <li><strong>Color Replacement:</strong> Click any cell in the grid to change its color, or use bulk replacement to swap all instances.</li>
-          <li><strong>Batch Analysis:</strong> Upload multiple sprites to find which ones work best with your bead palette. Sorted by accuracy score.</li>
-          <li><strong>Palette Suggestions:</strong> After batch upload, the app analyzes which missing colors would improve accuracy most.</li>
-          <li><strong>Accuracy Score:</strong> Based on average color deviation between original and bead version (100% = perfect match).</li>
+          <li><strong>Smart Image Processing:</strong> Automatic whitespace trimming and optional 2x downscaling for upscaled sprites.</li>
+          <li><strong>Color Adjustments:</strong> Fine-tune sprite colors before conversion with targeted hue adjustments and global color controls.</li>
+          <li><strong>Inventory Management:</strong> All {palette.length} bead colors for Arktal C beads are pre-loaded. Expand the inventory section to adjust quantities.</li>
+          <li><strong>Interactive Editing:</strong> Use the bead grid to edit individual beads, with adjustable zoom from 24px to 96px per cell.</li>
+          <li><strong>Color Tools:</strong> Quickly replace colors throughout your pattern, with both single-cell and bulk replacement options.</li>
+          <li><strong>Batch Analysis:</strong> Process multiple sprites at once to find which ones work best with your bead collection.</li>
+          <li><strong>Smart Suggestions:</strong> Get recommendations for new bead colors that would improve your conversion accuracy.</li>
+          <li><strong>Real-time Preview:</strong> See your changes instantly with live previews of color adjustments and bead replacements.</li>
         </ul>
       </div>
     </div>

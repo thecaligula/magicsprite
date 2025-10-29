@@ -1,42 +1,49 @@
-import { useState } from 'react';
-import { loadImageFromFile, trimCanvasWhitespace } from '../utils/imageUtils';
+import { useState, useEffect } from 'react';
+import { loadImageFromFile, trimCanvasWhitespace, applyModifiersToImage } from '../utils/imageUtils';
 import { findNearestInventoryColor, hexToRgb } from '../utils/colorUtils';
 
-/**
- * useImageConversion Hook
- * 
- * Core hook for sprite-to-bead conversion functionality. Handles:
- * - Image loading and preprocessing
- * - Sprite conversion to bead patterns
- * - Automatic size adjustment and downscaling
- * - Grid data generation for interactive editing
- * - Bead count tracking
- * 
- * The conversion process:
- * 1. Load and trim whitespace from uploaded image
- * 2. Optionally downscale if sprite appears to be upscaled
- * 3. Convert each pixel to nearest available bead color
- * 4. Generate interactive grid data for manual adjustments
- * 5. Track bead usage counts for inventory management
- * 
- * @param {Array} palette - Complete bead color palette
- * @param {Array} activeInventory - Currently available bead colors
- * @param {React.RefObject} canvasRef - Hidden canvas for image processing
- * @param {React.RefObject} resultCanvasRef - Hidden canvas for result preview
- */
 export function useImageConversion(palette, activeInventory, canvasRef, resultCanvasRef) {
   const [imageUrl, setImageUrl] = useState(null);
+  const [modifiers, setModifiers] = useState({
+    globalSat: 0,
+    globalVal: 0,
+    targetHue: 'All',
+    targetSat: 0,
+    targetVal: 0
+  });
+  const [isModifiersOpen, setIsModifiersOpen] = useState(false);
+  const [modifiedPreviewUrl, setModifiedPreviewUrl] = useState(null);
   const [convertedUrl, setConvertedUrl] = useState(null);
   const [beadCount, setBeadCount] = useState({});
   const [pixelGridData, setPixelGridData] = useState(null);
-  const [attemptDownscale, setAttemptDownscale] = useState(true);
+  const [attemptDownscale, setAttemptDownscale] = useState(false);
 
-  /**
-   * Updates the preview image based on the current grid data.
-   * Used after manual color overrides or bulk color replacements.
-   * 
-   * @param {Array<Array>} gridData - 2D array of bead color information
-   */
+  useEffect(() => {
+    async function generatePreview() {
+      if (!imageUrl) return;
+      if (!modifiers) return;
+
+      const baseImg = new Image();
+      baseImg.src = imageUrl;
+      await baseImg.decode();
+
+      try {
+        const modImg = await applyModifiersToImage(baseImg, modifiers);
+        const canvas = document.createElement('canvas');
+        canvas.width = modImg.width;
+        canvas.height = modImg.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(modImg, 0, 0);
+        setModifiedPreviewUrl(canvas.toDataURL());
+      } catch (err) {
+        console.warn("Live modifier preview failed:", err);
+      }
+    }
+
+    generatePreview();
+  }, [imageUrl, modifiers]); // ✅ live preview updates whenever sliders change
+
+
   function updatePreviewFromGrid(gridData) {
     const h = gridData.length;
     const w = gridData[0]?.length || 0;
@@ -69,12 +76,6 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
     setConvertedUrl(url);
   }
 
-  /**
-   * Recalculates bead counts after grid modifications.
-   * Ensures bead requirement numbers stay accurate after manual edits.
-   * 
-   * @param {Array<Array>} gridData - Current state of the bead grid
-   */
   function recalculateCounts(gridData) {
     const counts = {};
     activeInventory.forEach(item => counts[item.code] = 0);
@@ -114,16 +115,6 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
     }
   }
 
-  /**
-   * Main conversion function that transforms a sprite into a bead pattern.
-   * 
-   * Process:
-   * 1. Scale image to workable size (max 128px on longest side)
-   * 2. Apply optional 2x downscaling for upscaled sprites
-   * 3. Convert each pixel to nearest available bead color
-   * 4. Generate grid data for interactive editing
-   * 5. Create preview image
-   */
   async function convertImage() {
     if (!imageUrl || palette.length === 0) return;
 
@@ -132,12 +123,22 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
     img.src = imageUrl;
     await img.decode();
 
+    let modifiedImg = img;
+
+    if (modifiers) {
+      try {
+        modifiedImg = await applyModifiersToImage(img, modifiers);
+      } catch (err) {
+        console.warn("Modifier processing failed, using original image.", err);
+      }
+    }
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     
-    let w = img.width;
-    let h = img.height;
-    
+    let w = modifiedImg.width;
+    let h = modifiedImg.height;
+
     if (attemptDownscale) {
       w = Math.floor(w * 0.5);
       h = Math.floor(h * 0.5);
@@ -152,7 +153,7 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
     canvas.height = h;
     ctx.clearRect(0, 0, w, h);
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(img, 0, 0, w, h);
+    ctx.drawImage(modifiedImg, 0, 0, w, h);
 
     const imageData = ctx.getImageData(0, 0, w, h);
     const data = imageData.data;
@@ -206,6 +207,11 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
 
   return {
     imageUrl,
+    modifiers,
+    setModifiers,
+    isModifiersOpen,
+    setIsModifiersOpen,
+    modifiedPreviewUrl,
     convertedUrl,
     beadCount,
     pixelGridData,
