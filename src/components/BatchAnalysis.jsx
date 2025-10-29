@@ -2,6 +2,20 @@ import { Upload } from 'lucide-react';
 import { BatchResultCard } from './BatchResultCard';
 import { SuggestedColors } from './SuggestedColors';
 
+/**
+ * BatchAnalysis Component
+ * 
+ * Handles bulk sprite conversion analysis and provides color optimization suggestions.
+ * This component allows users to upload multiple sprites at once and:
+ * 1. Analyzes each sprite's compatibility with the current bead palette
+ * 2. Ranks sprites by conversion accuracy
+ * 3. Suggests new colors that would improve overall conversion quality
+ * 
+ * @param {boolean} processing - Whether batch processing is currently active
+ * @param {Array} batchResults - Processed sprite results with accuracy scores
+ * @param {Array} suggestedColors - Recommended colors to add to palette
+ * @param {Function} handleBatchUpload - Handler for file upload events
+ */
 export function BatchAnalysis({ 
   processing, 
   batchResults, 

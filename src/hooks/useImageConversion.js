@@ -2,6 +2,28 @@ import { useState } from 'react';
 import { loadImageFromFile, trimCanvasWhitespace } from '../utils/imageUtils';
 import { findNearestInventoryColor, hexToRgb } from '../utils/colorUtils';
 
+/**
+ * useImageConversion Hook
+ * 
+ * Core hook for sprite-to-bead conversion functionality. Handles:
+ * - Image loading and preprocessing
+ * - Sprite conversion to bead patterns
+ * - Automatic size adjustment and downscaling
+ * - Grid data generation for interactive editing
+ * - Bead count tracking
+ * 
+ * The conversion process:
+ * 1. Load and trim whitespace from uploaded image
+ * 2. Optionally downscale if sprite appears to be upscaled
+ * 3. Convert each pixel to nearest available bead color
+ * 4. Generate interactive grid data for manual adjustments
+ * 5. Track bead usage counts for inventory management
+ * 
+ * @param {Array} palette - Complete bead color palette
+ * @param {Array} activeInventory - Currently available bead colors
+ * @param {React.RefObject} canvasRef - Hidden canvas for image processing
+ * @param {React.RefObject} resultCanvasRef - Hidden canvas for result preview
+ */
 export function useImageConversion(palette, activeInventory, canvasRef, resultCanvasRef) {
   const [imageUrl, setImageUrl] = useState(null);
   const [convertedUrl, setConvertedUrl] = useState(null);
@@ -9,6 +31,12 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
   const [pixelGridData, setPixelGridData] = useState(null);
   const [attemptDownscale, setAttemptDownscale] = useState(true);
 
+  /**
+   * Updates the preview image based on the current grid data.
+   * Used after manual color overrides or bulk color replacements.
+   * 
+   * @param {Array<Array>} gridData - 2D array of bead color information
+   */
   function updatePreviewFromGrid(gridData) {
     const h = gridData.length;
     const w = gridData[0]?.length || 0;
@@ -41,6 +69,12 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
     setConvertedUrl(url);
   }
 
+  /**
+   * Recalculates bead counts after grid modifications.
+   * Ensures bead requirement numbers stay accurate after manual edits.
+   * 
+   * @param {Array<Array>} gridData - Current state of the bead grid
+   */
   function recalculateCounts(gridData) {
     const counts = {};
     activeInventory.forEach(item => counts[item.code] = 0);
@@ -80,6 +114,16 @@ export function useImageConversion(palette, activeInventory, canvasRef, resultCa
     }
   }
 
+  /**
+   * Main conversion function that transforms a sprite into a bead pattern.
+   * 
+   * Process:
+   * 1. Scale image to workable size (max 128px on longest side)
+   * 2. Apply optional 2x downscaling for upscaled sprites
+   * 3. Convert each pixel to nearest available bead color
+   * 4. Generate grid data for interactive editing
+   * 5. Create preview image
+   */
   async function convertImage() {
     if (!imageUrl || palette.length === 0) return;
 

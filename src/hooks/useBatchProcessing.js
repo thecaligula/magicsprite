@@ -3,11 +3,46 @@ import { loadImageFromFile, trimCanvasWhitespace, calculateAccuracyScore } from 
 import { findNearestInventoryColor, hexToRgb, rgbToHex } from '../utils/colorUtils';
 import { analyzeMissedColors } from '../utils/colorAnalysis';
 
+/**
+ * useBatchProcessing Hook
+ * 
+ * Manages bulk sprite-to-bead conversion for multiple images simultaneously.
+ * Provides batch analysis features including:
+ * - Parallel processing of multiple sprite uploads
+ * - Accuracy scoring for each conversion
+ * - Color mismatch detection and analysis
+ * - Suggested color palette improvements
+ * 
+ * The batch process:
+ * 1. Process multiple images in sequence
+ * 2. Apply same conversion settings to all sprites
+ * 3. Calculate accuracy scores and identify problem areas
+ * 4. Generate suggestions for inventory additions
+ * 
+ * @param {Array} palette - Complete bead color palette
+ * @param {Array} activeInventory - Currently available bead colors
+ * @param {boolean} attemptDownscale - Whether to apply 2x downscaling
+ */
 export function useBatchProcessing(palette, activeInventory, attemptDownscale) {
   const [batchResults, setBatchResults] = useState([]);
   const [processing, setProcessing] = useState(false);
   const [suggestedColors, setSuggestedColors] = useState([]);
 
+  /**
+   * Processes multiple sprite images for batch conversion.
+   * For each image:
+   * 1. Trim whitespace borders
+   * 2. Apply optional downscaling
+   * 3. Convert to bead pattern
+   * 4. Calculate conversion accuracy
+   * 5. Analyze color mismatches
+   * 
+   * After processing all images:
+   * - Sort results by accuracy score
+   * - Generate color suggestions based on mismatches
+   * 
+   * @param {Event} e - File input change event
+   */
   async function handleBatchUpload(e) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;

@@ -15,12 +15,43 @@ import { BatchAnalysis } from './components/BatchAnalysis';
 // Import palette data
 import paletteData from './palette.json';
 
+/**
+ * App Component
+ * 
+ * Main application component for the Fusebead Sprite Converter.
+ * Orchestrates all major features:
+ * - Bead palette and inventory management
+ * - Single sprite conversion and editing
+ * - Batch sprite analysis
+ * - Color optimization suggestions
+ * 
+ * Architecture:
+ * - Uses custom hooks for core functionality separation
+ * - Hidden canvases for image processing
+ * - Centralized state management
+ * - Responsive layout with Tailwind CSS
+ * 
+ * Features are organized into sections:
+ * 1. Inventory management (top)
+ * 2. Single conversion interface
+ * 3. Interactive bead grid editor
+ * 4. Bead requirements display
+ * 5. Batch analysis tools
+ */
 export default function App() {
+  // Core state and refs
   const [palette, setPalette] = useState([]);
   const canvasRef = useRef(null);
   const resultCanvasRef = useRef(null);
 
-  // Initialize palette
+  /**
+   * Initialize palette on component mount.
+   * Transforms raw JSON data into structured color objects with:
+   * - Unique color codes
+   * - Standardized color names
+   * - Hex color values
+   * - RGB component values
+   */
   useEffect(() => {
     const paletteArray = Object.entries(paletteData).map(([code, data]) => ({
       code: code,
@@ -33,7 +64,14 @@ export default function App() {
     setPalette(paletteArray);
   }, []);
 
-  // Custom hooks
+  /**
+   * Custom Hook Integration
+   * 
+   * useInventory: Manages available bead colors and quantities
+   * useImageConversion: Handles sprite-to-bead conversion process
+   * useGridEditor: Provides interactive grid editing capabilities
+   * useBatchProcessing: Manages bulk sprite analysis features
+   */
   const { inventory, activeInventory, updateInventory } = useInventory(palette);
   
   const {
@@ -94,6 +132,7 @@ export default function App() {
         palette={palette}
       />
 
+      {/* Interactive Editing Section - Only shown when grid is toggled and data exists */}
       {showGrid && pixelGridData && (
         <section className="mb-6 border rounded-lg p-4 bg-gray-50">
           <BeadGrid
@@ -134,6 +173,10 @@ export default function App() {
         handleBatchUpload={handleBatchUpload}
       />
 
+      {/* Hidden canvases for image processing
+          - canvasRef: Used for initial image loading and manipulation
+          - resultCanvasRef: Used for generating the final bead pattern preview
+      */}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
       <canvas ref={resultCanvasRef} style={{ display: 'none' }} />
 

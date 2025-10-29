@@ -1,3 +1,16 @@
+/**
+ * Trims transparent or white borders from a canvas image.
+ * Handles both transparent backgrounds and white/light backgrounds.
+ * 
+ * Process:
+ * 1. Detects if image uses transparency
+ * 2. If not transparent, checks if background is light
+ * 3. Finds boundaries of non-empty content
+ * 4. Creates new canvas with trimmed content
+ * 
+ * @param {HTMLCanvasElement} srcCanvas - Source canvas to trim
+ * @returns {HTMLCanvasElement} New canvas with trimmed content
+ */
 export function trimCanvasWhitespace(srcCanvas) {
   const ctx = srcCanvas.getContext('2d');
   const w = srcCanvas.width;
@@ -55,6 +68,16 @@ export function trimCanvasWhitespace(srcCanvas) {
   return out;
 }
 
+/**
+ * Loads an image file into an Image object asynchronously.
+ * Handles the multi-step process of:
+ * 1. Reading file as DataURL
+ * 2. Creating Image object
+ * 3. Loading image data
+ * 
+ * @param {File} file - Image file from input or drop event
+ * @returns {Promise<HTMLImageElement>} Loaded image
+ */
 export function loadImageFromFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -69,6 +92,21 @@ export function loadImageFromFile(file) {
   });
 }
 
+/**
+ * Calculates color accuracy score between original image and bead conversion.
+ * Score ranges from 0-100, where:
+ * - 100: Perfect color match
+ * - 0: Maximum possible color difference
+ * 
+ * Process:
+ * 1. Compares each non-transparent pixel
+ * 2. Calculates Euclidean distance in RGB space
+ * 3. Averages differences and normalizes to 0-100 scale
+ * 
+ * @param {ImageData} originalImageData - Source image pixel data
+ * @param {ImageData} beadImageData - Converted bead pattern pixel data
+ * @returns {number} Accuracy score (0-100)
+ */
 export function calculateAccuracyScore(originalImageData, beadImageData) {
   const data1 = originalImageData.data;
   const data2 = beadImageData.data;

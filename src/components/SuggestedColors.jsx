@@ -1,3 +1,29 @@
+/**
+ * SuggestedColors Component
+ * 
+ * Displays recommended bead colors to add to inventory based on
+ * batch conversion analysis. Helps users optimize their palette
+ * by identifying commonly needed colors that aren't well-matched.
+ * 
+ * Features:
+ * - Ranked list of suggested colors
+ * - Visual comparison with closest existing matches
+ * - Usage statistics and impact scores
+ * - Responsive grid layout
+ * - Informational tooltips
+ * 
+ * Color Analysis Display:
+ * - Hex color codes
+ * - Usage frequency in batch
+ * - Average error impact
+ * - Side-by-side comparison with current palette
+ * 
+ * @param {Array} suggestedColors - Color suggestions with:
+ *   - hex: Color code in hex format
+ *   - count: Number of occurrences
+ *   - impact: Error reduction score
+ *   - closestExisting: Nearest current palette match
+ */
 export function SuggestedColors({ suggestedColors }) {
   if (suggestedColors.length === 0) {
     return null;

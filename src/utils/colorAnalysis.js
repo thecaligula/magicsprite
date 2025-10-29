@@ -1,6 +1,20 @@
 import { rgbToHex } from './colorUtils';
 import { findNearestPaletteColor } from './colorUtils';
 
+/**
+ * Analyzes color mismatches from batch conversions to suggest inventory additions.
+ * The analysis process:
+ * 1. Groups similar missed colors using a distance threshold
+ * 2. Calculates average RGB values for each group
+ * 3. Ranks groups by their impact (frequency * average distance)
+ * 4. Filters out groups that have close matches in inventory
+ * 5. Returns top suggestions for inventory additions
+ * 
+ * @param {Array} missedColors - List of color mismatches from conversions
+ * @param {Array} palette - Complete bead color palette
+ * @param {Array} activeInventory - Currently available bead colors
+ * @returns {Array} Top 30 color suggestions with impact scores
+ */
 export function analyzeMissedColors(missedColors, palette, activeInventory) {
   const colorGroups = [];
   const threshold = 50;

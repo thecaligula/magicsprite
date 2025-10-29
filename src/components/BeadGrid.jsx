@@ -1,5 +1,28 @@
 import { getBrightness } from '../utils/colorUtils';
 
+/**
+ * BeadGrid Component
+ * 
+ * Interactive grid display for bead pattern editing.
+ * Features:
+ * - Zoomable grid view (24px to 96px per cell)
+ * - Color codes displayed in cells at higher zoom levels
+ * - Cell selection for color overrides
+ * - Automatic text color adjustment for readability
+ * - Scroll support for large patterns
+ * 
+ * Visual elements:
+ * - Grid cells showing bead colors
+ * - Color codes in cells (when zoomed in)
+ * - Selected cell highlighting
+ * - Hover effects for interactive feedback
+ * 
+ * @param {Array<Array>} pixelGridData - 2D array of bead color data
+ * @param {Object} selectedCell - Currently selected cell coordinates
+ * @param {number} gridZoom - Current zoom level in pixels
+ * @param {Function} setGridZoom - Updates grid zoom level
+ * @param {Function} handleCellClick - Cell selection handler
+ */
 export function BeadGrid({ 
   pixelGridData, 
   selectedCell, 

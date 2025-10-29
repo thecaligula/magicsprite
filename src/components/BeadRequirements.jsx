@@ -1,4 +1,21 @@
+/**
+ * BeadRequirements Component
+ * 
+ * Displays a detailed table showing the required beads for the current sprite conversion.
+ * Compares needed quantities against available inventory and highlights shortages.
+ * 
+ * @param {Object} beadCount - Number of beads needed for each color code
+ * @param {Array} palette - Complete palette data with color information
+ * @param {Object} inventory - Current inventory levels for each color code
+ * 
+ * Features:
+ * - Sorts beads by quantity needed (highest first)
+ * - Shows visual color samples
+ * - Highlights shortages in red
+ * - Only displays colors that are actually used (count > 0)
+ */
 export function BeadRequirements({ beadCount, palette, inventory }) {
+  // Don't render anything if no beads are needed
   if (Object.keys(beadCount).length === 0) {
     return null;
   }

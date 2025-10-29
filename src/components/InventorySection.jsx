@@ -1,6 +1,28 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
+/**
+ * InventorySection Component
+ * 
+ * Collapsible section for managing bead inventory levels.
+ * Features:
+ * - Toggle visibility with expand/collapse
+ * - Grid layout of all available bead colors
+ * - Quantity input for each bead type
+ * - Visual color samples
+ * - Responsive grid layout (2 columns mobile, 4 columns desktop)
+ * 
+ * Inventory Management:
+ * - Input validation (non-negative numbers only)
+ * - Real-time inventory updates
+ * - Active color count display
+ * - Color code and name display
+ * 
+ * @param {Array} palette - Complete bead color palette
+ * @param {Object} inventory - Current quantities for each color
+ * @param {Array} activeInventory - Colors with non-zero quantities
+ * @param {Function} updateInventory - Handler for quantity changes
+ */
 export function InventorySection({ palette, inventory, activeInventory, updateInventory }) {
   const [showInventory, setShowInventory] = useState(false);
 

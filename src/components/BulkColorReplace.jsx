@@ -1,3 +1,22 @@
+/**
+ * BulkColorReplace Component
+ * 
+ * Provides interface for mass color replacement operations.
+ * Allows users to:
+ * - Select a color currently used in the pattern
+ * - Choose a replacement color from available inventory
+ * - Replace all instances of one color with another
+ * 
+ * Useful for:
+ * - Adjusting patterns when running low on certain beads
+ * - Experimenting with different color combinations
+ * - Quick palette modifications
+ * 
+ * @param {Object} beadCount - Current bead usage counts by color
+ * @param {Array} palette - Complete bead color palette
+ * @param {Array} activeInventory - Available bead colors
+ * @param {Function} replaceAllColor - Handler for bulk color replacement
+ */
 export function BulkColorReplace({ beadCount, palette, activeInventory, replaceAllColor }) {
   if (Object.keys(beadCount).length === 0) {
     return null;

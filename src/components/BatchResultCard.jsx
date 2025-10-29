@@ -1,3 +1,23 @@
+/**
+ * BatchResultCard Component
+ * 
+ * Displays the results of a single sprite's bead conversion analysis.
+ * Shows:
+ * - Ranking position in batch
+ * - Original and converted sprite previews
+ * - Conversion accuracy percentage
+ * - Quality assessment (Excellent/Good/Fair/Poor)
+ * - Original sprite dimensions
+ * 
+ * @param {Object} result - Analysis result data including:
+ *   - accuracy: Conversion accuracy percentage
+ *   - originalUrl: URL of original sprite image
+ *   - beadUrl: URL of bead conversion preview
+ *   - width: Sprite width in pixels
+ *   - height: Sprite height in pixels
+ *   - filename: Original file name
+ * @param {number} idx - Result's position in sorted batch results
+ */
 export function BatchResultCard({ result, idx }) {
   const accuracy = parseFloat(result.accuracy);
   

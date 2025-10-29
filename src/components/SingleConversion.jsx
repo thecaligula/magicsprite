@@ -1,3 +1,31 @@
+/**
+ * SingleConversion Component
+ * 
+ * Main interface for converting individual sprites to bead patterns.
+ * Features:
+ * - File upload for sprite images
+ * - Side-by-side original and converted previews
+ * - Downscaling option for upscaled sprites
+ * - Interactive grid toggle
+ * - Pixel-perfect image rendering
+ * 
+ * Workflow:
+ * 1. Upload sprite image
+ * 2. Configure downscaling preference
+ * 3. Convert to bead pattern
+ * 4. View/edit in bead grid
+ * 
+ * @param {string} imageUrl - URL of uploaded sprite
+ * @param {string} convertedUrl - URL of converted bead pattern
+ * @param {boolean} attemptDownscale - Whether to try 2x downscaling
+ * @param {Function} setAttemptDownscale - Updates downscale preference
+ * @param {Array<Array>} pixelGridData - Generated bead grid data
+ * @param {Function} onFileChange - File upload handler
+ * @param {Function} convertImage - Conversion trigger handler
+ * @param {boolean} showGrid - Whether bead grid is visible
+ * @param {Function} setShowGrid - Updates grid visibility
+ * @param {Array} palette - Available bead color palette
+ */
 export function SingleConversion({ 
   imageUrl, 
   convertedUrl, 

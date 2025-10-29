@@ -1,3 +1,18 @@
+/**
+ * CellOverridePanel Component
+ * 
+ * Provides color selection interface for manual bead color overrides.
+ * Appears when a grid cell is selected and allows users to:
+ * - View currently available bead colors
+ * - Apply a new color to the selected cell
+ * - Cancel the override operation
+ * 
+ * @param {Object} selectedCell - Currently selected cell coordinates {x, y}
+ * @param {Array<Array>} pixelGridData - Complete grid state data
+ * @param {Array} activeInventory - Available bead colors
+ * @param {Function} overrideCell - Handler for applying color changes
+ * @param {Function} setSelectedCell - Updates selected cell state
+ */
 export function CellOverridePanel({ 
   selectedCell, 
   pixelGridData, 
