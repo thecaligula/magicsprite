@@ -120,16 +120,20 @@ export async function applyModifiersToImage(img, modifiers) {
   const { globalSat = 0, globalVal = 0, targetHue = "All", targetSat = 0, targetVal = 0 } = modifiers;
 
   for (let i = 0; i < d.length; i += 4) {
-    if (d[i + 3] < 128) continue; // skip transparent
+    if (d[i + 3] < 128) continue;
+
     const r = d[i], g = d[i + 1], b = d[i + 2];
     const { h, s, v } = rgbToHsv(r, g, b);
 
-    let hD = h * 360;
-    let newS = s + globalSat / 100;
+    const satInfluence = s; // Makes sure grays/whites barely change
+
+    let newS = s + (globalSat / 100) * satInfluence;
     let newV = v + globalVal / 100;
 
-    if (targetHue !== "All" && isHueInGroup(hD, targetHue, s)) {
-      newS += targetSat / 100;
+    const hDeg = h * 360;
+
+    if (targetHue !== "All" && isHueInGroup(hDeg, targetHue, s)) {
+      newS += (targetSat / 100) * satInfluence;
       newV += targetVal / 100;
     }
 
@@ -146,3 +150,4 @@ export async function applyModifiersToImage(img, modifiers) {
   await newImg.decode();
   return newImg;
 }
+
