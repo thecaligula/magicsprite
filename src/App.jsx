@@ -5,7 +5,8 @@ import { ChevronDown, ChevronUp, Upload, X } from 'lucide-react';
 import paletteData from './palette.json';
 
 // Default inventory - all colors with generous amounts
-const defaultInventory = {"C10":1000,"C17":1000,"C43":1000,"C02":1000,"C42":1000,"C57":1000,"C22":1000,"C31":1000,"C34":1000,"C03":1000,"C07":1000,"C51":1000,"C32":1000,"C23":1000,"C88":1000,"C01":1000,"C47":1000,"C33":1000,"C52":1000,"C26":1000,"C25":1000,"C21":1000,"C20":1000,"C19":1000,"C15":1000,"C14":1000,"C12":1000,"C13":1000,"C09":1000,"C05":1000};
+const defaultInventory = {"C10":1000,"C17":1000,"C43":1000,"C02":1000,"C42":1000,"C57":1000,"C22":1000,"C31":1000,"C34":1000,"C03":1000,"C07":1000,"C51":1000,"C32":1000,"C23":1000,"C88":1000,"C01":1000,"C47":1000,"C33":1000,"C52":1000,"C26":1000,"C25":1000,"C21":1000,"C20":1000,"C19":1000,"C15":1000,"C14":1000,"C12":1000,"C13":1000,"C09":1000,"C05":1000,"C157":1000,"C75":1000,"C139":1000,"C18":1000,"C136":1000,"C89":1000,"C95":1000,"C46":1000,"C91":1000,"C148":1000,"C30":1000,"C97":1000,"C126":1000,"C112":1000,"C155":1000,"C76":1000,"C133":1000,"C140":1000,"C120":1000,"C149":1000,"C117":1000,"C72":1000,"C129":1000,"C53":1000,"C143":1000,"C119":1000,"C71":1000,"C73":1000,"C121":1000,"C11":1000};
+//const defaultInventory = {"C10":1000,"C17":1000,"C43":1000,"C02":1000,"C42":1000,"C57":1000,"C22":1000,"C31":1000,"C34":1000,"C03":1000,"C07":1000,"C51":1000,"C32":1000,"C23":1000,"C88":1000,"C01":1000,"C47":1000,"C33":1000,"C52":1000,"C26":1000,"C25":1000,"C21":1000,"C20":1000,"C19":1000,"C15":1000,"C14":1000,"C12":1000,"C13":1000,"C09":1000,"C05":1000};
 
 
 // --- Utility helpers ---
@@ -570,19 +571,39 @@ export default function App() {
       return impactB - impactA;
     });
 
-    // Find closest palette colors for each suggested color
-    const suggestions = colorGroups.slice(0, 10).map(group => {
+    // Process and filter color groups
+    const processedGroups = colorGroups.map(group => {
       const hex = rgbToHex(group.average.r, group.average.g, group.average.b);
       const closestPalette = findNearestPaletteColor(group.average, palette);
+      const impact = group.count * (group.totalDistance / group.count);
+      
+      // Check if the closest palette color is in the active inventory
+      const closestInInventory = activeInventory.find(inv => inv.code === closestPalette.code);
       
       return {
-        hex: hex,
+        hex,
         rgb: group.average,
         count: group.count,
-        impact: (group.totalDistance / group.count).toFixed(1),
-        closestExisting: closestPalette
+        impact,
+        impactScore: impact.toFixed(1),
+        closestPalette,
+        hasMatchInInventory: !!closestInInventory
       };
     });
+
+    // Filter and sort the groups
+    const uniqueGroups = processedGroups
+      .filter(group => !group.hasMatchInInventory) // Only keep colors without matches in inventory
+      .sort((a, b) => b.impact - a.impact); // Sort by impact score
+
+    // Create the final suggestions (up to 30)
+    const suggestions = uniqueGroups.slice(0, 30).map(group => ({
+      hex: group.hex,
+      rgb: group.rgb,
+      count: group.count,
+      impact: group.impactScore,
+      closestExisting: group.closestPalette
+    }));
 
     setSuggestedColors(suggestions);
   }
