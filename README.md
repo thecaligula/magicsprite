@@ -1,6 +1,7 @@
-# 🎨 MagicSprite - Fusebead Pattern Creator
+# 🎨 MagicSprite - Image to Fusbead Pattern Converter
 
-A sprite-to-fusebead conversion tool that transforms pixel art into optimized bead patterns. Features color adjustment tools, inventory tracking, and batch processing capabilities to streamline the bead sprite creation workflow. Includes post generation editing.
+A sprite-to-fusebead conversion tool that transforms pixel art into bead patterns and shows how the sprite would actually look using real bead colours.
+Features color adjustment tools, inventory tracking, and batch processing capabilities to streamline the bead sprite creation workflow. Includes post generation editing.
 
 ## ✨ Features
 
