@@ -67,7 +67,3 @@ npm run dev
 Found a bug? Have a cool idea? Feel free to:
 - Open an issue
 - Submit a pull request
-
-## 📝 License
-
-MIT
